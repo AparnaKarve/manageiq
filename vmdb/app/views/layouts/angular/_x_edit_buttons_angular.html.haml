@@ -6,7 +6,8 @@
                "ng-class"    => "{'btn-disabled': !angularForm.$valid}",
                "ng-click"    => "addClicked()",
                "ng-disabled" => "!miqService.saveable(angularForm)",
-               "ng-show"     => "newRecord")
+               "ng-show"     => "newRecord",
+               "data-action" => "test")
 
   = button_tag("Save",
                :class        => "btn btn-primary",

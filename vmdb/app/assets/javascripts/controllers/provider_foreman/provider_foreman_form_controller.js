@@ -70,7 +70,7 @@ miqAngularApplication.controller('providerForemanFormController', ['$http', '$sc
 
     var providerForemanEditButtonClicked = function(buttonName, serializeFields) {
       miqService.sparkleOn();
-      var url = '/provider_foreman/provider_foreman_edit/' + providerForemanFormId + '?button=' + buttonName;
+      var url = '/provider_foreman/edit/' + providerForemanFormId + '?button=' + buttonName;
       if (serializeFields === undefined) {
         miqService.miqAjaxButton(url);
       } else {
@@ -90,12 +90,15 @@ miqAngularApplication.controller('providerForemanFormController', ['$http', '$sc
     };
 
     $scope.saveClicked = function() {
-      providerForemanEditButtonClicked('save', true);
-      $scope.angularForm.$setPristine(true);
+      miqService.sparkleOn();
+      var url = '/provider_foreman/update/' + providerForemanFormId + '?button=save';
+      miqService.miqAjaxButton(url, true);
     };
 
     $scope.addClicked = function() {
-      $scope.saveClicked();
+      miqService.sparkleOn();
+      var url = '/provider_foreman/create/' + providerForemanFormId + '?button=add';
+      miqService.miqAjaxButton(url, true);
     };
 
     init();

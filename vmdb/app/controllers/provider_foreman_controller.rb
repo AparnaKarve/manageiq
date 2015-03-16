@@ -14,11 +14,8 @@ class ProviderForemanController < ApplicationController
   end
 
   PROVIDER_FOREMAN_X_BUTTON_ALLOWED_ACTIONS = {
-    'provider_foreman_new'                     => :provider_foreman_new,
-    'provider_foreman_edit'                    => :provider_foreman_edit,
-    'provider_foreman_delete'                  => :provider_foreman_delete,
-    'provider_foreman_refresh'                 => :provider_foreman_refresh,
-    'provider_foreman_authentication_validate' => :provider_foreman_authentication_validate
+    'provider_foreman_refresh'                           => :refresh,
+    'provider_foreman_authentication_validate'           => :authentication_validate
   }.freeze
 
   def x_button
@@ -30,29 +27,46 @@ class ProviderForemanController < ApplicationController
     send(PROVIDER_FOREMAN_X_BUTTON_ALLOWED_ACTIONS[action])
   end
 
-  def provider_foreman_new
+  def new
     assert_privileges("provider_foreman_new")
-    @in_a_form = true
     @provider_foreman = ConfigurationManagerForeman.new
-    replace_right_cell
+    presenter = ExplorerPresenter.new(
+        :active_tree => x_active_tree,
+        :temp        => @temp,
+        :delete_node => @delete_node,      # Remove a new node from the tree
+    )
+    r = proc { |opts| render_to_string(opts) }
+    presenter[:update_partials][:main_div] = r[:partial => 'form', :locals => {:controller => 'provider_foreman'}]
+    rebuild_toolbars(false, presenter, false)
+    render :js => presenter.to_html 
+
+    #build_foreman_tree(:providers, :foreman_providers_tree)
+    #replace_right_cell(true)
   end
 
-  def provider_foreman_edit
+  def edit
     assert_privileges("provider_foreman_edit")
-    case params[:button]
-    when "cancel"
+    if params[:button] == "cancel"
       cancel_provider_foreman
-    when "save"
-      add_provider_foreman
-      save_provider_foreman
     else
       @provider_foreman = find_by_id_filtered(ConfigurationManagerForeman, from_cid(params[:miq_grid_checks]))
-      @in_a_form = true
-      replace_right_cell
+      replace_right_cell(true)
     end
   end
 
-  def provider_foreman_delete
+  def create
+    assert_privileges("provider_foreman_edit")
+    add_provider_foreman
+    save_provider_foreman
+  end
+
+  def update
+    assert_privileges("provider_foreman_edit")
+    add_provider_foreman
+    save_provider_foreman
+  end
+
+  def delete
     assert_privileges("provider_foreman_delete")
     foremen = find_checked_items
     if foremen.empty?
@@ -74,18 +88,16 @@ class ProviderForemanController < ApplicationController
                     {:task        => "Delete",
                      :count_model => pluralize(foremen.length, "Provider")})
     end
-    @in_a_form = false
     @sb[:action] = nil
-    replace_right_cell
+    replace_right_cell(false)
   end
 
-  def provider_foreman_refresh
+  def refresh
     assert_privileges("provider_foreman_refresh")
     @explorer = true
     foreman_refresh
-    @in_a_form = false
     @sb[:action] = nil
-    replace_right_cell
+    replace_right_cell(false)
   end
 
   def add_provider_foreman
@@ -118,12 +130,11 @@ class ProviderForemanController < ApplicationController
     if @provider_foreman.save
       construct_edit
       AuditEvent.success(build_created_audit(@provider_foreman, @edit))
-      @in_a_form = false
       @sb[:action] = nil
       add_flash(_("%{model} \"%{name}\" was %{action}") % {:model  => ui_lookup(:model => "ProviderForeman"),
                                                            :name   => @provider_foreman.name,
                                                            :action => params[:id] == "new" ? "added" : "updated"})
-      replace_right_cell([:foreman_providers])
+      replace_right_cell(false, [:foreman_providers])
     else
       @provider_foreman.errors.each do |field, msg|
         add_flash("#{field.to_s.capitalize} #{msg}", :error)
@@ -132,12 +143,11 @@ class ProviderForemanController < ApplicationController
   end
 
   def cancel_provider_foreman
-    @in_a_form = false
     @sb[:action] = nil
     add_flash(_("%{action} %{model} was cancelled by the user") %
                   {:model  => ui_lookup(:model => "ConfigurationManagerForeman"),
                    :action => params[:id] == "new" ? "Add of" : "Edit of"})
-    replace_right_cell
+    replace_right_cell(false)
   end
 
   def provider_foreman_form_fields
@@ -156,7 +166,7 @@ class ProviderForemanController < ApplicationController
     }
   end
 
-  def provider_foreman_authentication_validate
+  def authentication_validate
     assert_privileges("provider_foreman_authentication_validate")
     @provider_foreman = ProviderForeman.new(:name       => params[:name],
                                             :url        => params[:url],
@@ -176,9 +186,39 @@ class ProviderForemanController < ApplicationController
     end
   end
 
+  def configured_system_miq_request_new
+    assert_privileges("provider_foreman_configured_system_miq_request_new")
+    configuration_profiles_for_provisioning = []
+    configured_systems = find_checked_items
+    if configured_systems.empty?
+      add_flash(_("No %{model} were selected for %{task}") % {:model => ui_lookup(:tables => "configured_systems"),
+                                                              :task  => "provision"}, :error)
+    else
+      ConfiguredSystem.find_all_by_id(configured_systems, :order => "lower(name)").each do |configured_system|
+        id = configured_system.id
+        configured_system_hostname = configured_system.name
+        audit = {:event        => "configured_system_record_provisioning_initiated",
+                 :message      => "[#{configured_system_hostname}] Provisioning initiated",
+                 :target_id    => id,
+                 :target_class => "ConfiguredSystem",
+                 :userid       => session[:userid]}
+        AuditEvent.success(audit)
+
+        configuration_profiles_for_provisioning.push(configured_system.configuration_profile_id)
+      end
+
+      #add_flash(_("%{task} initiated for %{count_model} from the CFME Database") %
+      #              {:task        => "Delete",
+      #               :count_model => pluralize(foremen.length, "Provider")})
+    end
+    @sb[:action] = nil
+    replace_right_cell(true)
+
+  end
+
   def show(id = nil)
     @flash_array = [] if params[:display]
-    @sb[:action] = params[:display]
+    @sb[:action] = nil
 
     @display = params[:display] || "main"
     @lastaction = "show"
@@ -199,7 +239,7 @@ class ProviderForemanController < ApplicationController
     self.x_node = params[:id]
     @sb[:action] = nil
     load_or_clear_adv_search
-    replace_right_cell
+    replace_right_cell(false)
   end
 
   def accordion_select
@@ -208,7 +248,7 @@ class ProviderForemanController < ApplicationController
     self.x_active_accord = params[:id]
     self.x_active_tree   = "#{params[:id]}_tree"
     load_or_clear_adv_search
-    replace_right_cell
+    replace_right_cell(false)
   end
 
   def load_or_clear_adv_search
@@ -306,7 +346,7 @@ class ProviderForemanController < ApplicationController
 
     # if AJAX request, replace right cell, and return
     if request.xml_http_request?
-      replace_right_cell
+      replace_right_cell(false)
       return
     end
 
@@ -489,10 +529,10 @@ class ProviderForemanController < ApplicationController
     end
   end
 
-  def replace_right_cell(replace_trees = [])
+  def replace_right_cell(in_a_form = false, replace_trees = [])
     @explorer = true
 
-    record_showing = leaf_record
+    record_showing = leaf_record(in_a_form)
 
     # Build presenter to render the JS command for the tree update
     presenter = ExplorerPresenter.new(
@@ -502,19 +542,19 @@ class ProviderForemanController < ApplicationController
     )
     r = proc { |opts| render_to_string(opts) }
 
-    presenter[:right_cell_text] = @right_cell_text
-    update_partials(record_showing, presenter, r)
+    update_partials(record_showing, presenter, r, in_a_form)
     replace_search_box(presenter, r)
-    handle_bottom_cell(presenter, r)
+    handle_bottom_cell(presenter, r, in_a_form)
     replace_explorer_trees(replace_trees, presenter, r)
-    rebuild_toolbars(record_showing, presenter)
+    rebuild_toolbars(record_showing, presenter, in_a_form)
+    presenter[:right_cell_text] = @right_cell_text
 
     # Render the JS responses to update the explorer screen
     render :js => presenter.to_html
   end
 
-  def leaf_record
-    if !@in_a_form && !@sb[:action]
+  def leaf_record(in_a_form)
+    if !in_a_form
       get_node_info(x_node)
       @delete_node = params[:id] if @replace_trees
       type, _id = x_node.split("_").last.split("-")
@@ -522,13 +562,13 @@ class ProviderForemanController < ApplicationController
     end
   end
 
-  def update_partials(record_showing, presenter, r)
+  def update_partials(record_showing, presenter, r, in_a_form)
     if record_showing
       presenter[:set_visible_elements][:form_buttons_div] = false
       path_dir = "provider_foreman"
       presenter[:update_partials][:main_div] =
           r[:partial => "#{path_dir}/main", :locals => {:controller => 'provider_foreman'}]
-    elsif @in_a_form
+    elsif in_a_form
       partial_locals = {:controller => 'provider_foreman'}
       if @sb[:action] == "provider_foreman_new"
         @right_cell_text = _("Add a new Foreman Provider")
@@ -552,10 +592,10 @@ class ProviderForemanController < ApplicationController
     presenter[:clear_gtl_list_grid] = @gtl_type && @gtl_type != 'list'
   end
 
-  def handle_bottom_cell(presenter, r)
+  def handle_bottom_cell(presenter, r, in_a_form)
     # Handle bottom cell
-    if @pages || @in_a_form
-      if @pages && !@in_a_form
+    if @pages || in_a_form
+      if @pages && !in_a_form
         @ajax_paging_buttons = true
         if @sb[:action] && @record  # Came in from an action link
           presenter[:update_partials][:paging_div] = r[:partial => 'layouts/x_pagingcontrols',
@@ -568,7 +608,7 @@ class ProviderForemanController < ApplicationController
         end
         presenter[:set_visible_elements][:form_buttons_div] = false
         presenter[:set_visible_elements][:pc_div_1] = true
-      elsif @in_a_form
+      elsif in_a_form
         presenter[:set_visible_elements][:pc_div_1] = false
         presenter[:set_visible_elements][:form_buttons_div] = true
       end
@@ -579,7 +619,7 @@ class ProviderForemanController < ApplicationController
   end
 
   def replace_explorer_trees(replace_trees, presenter, r)
-    foreman_tree = build_foreman_tree(:providers, :foreman_providers_tree) if replace_trees
+    foreman_tree = build_foreman_tree(:providers, :foreman_providers_tree)
     replace_trees.each do |t|
       presenter[:replace_partials]["#{t}_tree_div".to_sym] = r[:partial => 'shared/tree',
                                                                :locals  => {:tree => foreman_tree,
@@ -588,15 +628,18 @@ class ProviderForemanController < ApplicationController
     end
   end
 
-  def rebuild_toolbars(record_showing, presenter)
-    c_buttons,  c_xml  = build_toolbar_buttons_and_xml(center_toolbar_filename)
-    if record_showing
-      cb_buttons, cb_xml = build_toolbar_buttons_and_xml("custom_buttons_tb")
-      v_buttons,  v_xml  = build_toolbar_buttons_and_xml("x_summary_view_tb")
-    else
-      v_buttons,  v_xml  = build_toolbar_buttons_and_xml("x_gtl_view_tb")
+  def rebuild_toolbars(record_showing, presenter, in_a_form)
+    if !in_a_form && !@sb[:action]
+      c_buttons,  c_xml  = build_toolbar_buttons_and_xml(center_toolbar_filename)
+      if record_showing
+        cb_buttons, cb_xml = build_toolbar_buttons_and_xml("custom_buttons_tb")
+        v_buttons,  v_xml  = build_toolbar_buttons_and_xml("x_summary_view_tb")
+      else
+        v_buttons,  v_xml  = build_toolbar_buttons_and_xml("x_gtl_view_tb")
+      end
+    elsif !in_a_form
+      h_buttons, h_xml = build_toolbar_buttons_and_xml("x_history_tb")
     end
-    h_buttons, h_xml = build_toolbar_buttons_and_xml("x_history_tb") unless @in_a_form
 
     # Rebuild the toolbars
     presenter[:set_visible_elements][:history_buttons_div] = h_buttons  && h_xml
@@ -613,13 +656,13 @@ class ProviderForemanController < ApplicationController
     presenter[:miq_record_id] = @record ? @record.id : nil
 
     # Hide/show searchbox depending on if a list is showing
-    presenter[:set_visible_elements][:adv_searchbox_div] = !(@record || @in_a_form)
+    presenter[:set_visible_elements][:adv_searchbox_div] = !(@record || in_a_form)
 
-    presenter[:osf_node] = x_node  # Open, select, and focus on this node
+    #presenter[:osf_node] = x_node  # Open, select, and focus on this node
 
     presenter[:set_visible_elements][:blocker_div]    = false unless @edit && @edit[:adv_search_open]
     presenter[:set_visible_elements][:quicksearchbox] = false
-    presenter[:lock_unlock_trees][x_active_tree] = @in_a_form
+    presenter[:lock_unlock_trees][x_active_tree] = in_a_form
   end
 
   def construct_edit

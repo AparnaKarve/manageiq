@@ -26,8 +26,10 @@
       :text: "Add a new Foreman Provider"
       :title: "Add a new Foreman Provider"
       :enabled: 'true'
+      :url: new
     - :button: provider_foreman_edit
       :image: edit
+      :url: edit
       :text: Edit Selected item
       :title: Select a single item to edit
       :url_parms: 'main_div'
@@ -35,6 +37,7 @@
       :onwhen: '1'
     - :button: provider_foreman_delete
       :image: remove
+      :url: delete
       :text: Remove selected items from the VMDB
       :title: Remove selected items from the VMDB
       :url_parms: 'main_div'

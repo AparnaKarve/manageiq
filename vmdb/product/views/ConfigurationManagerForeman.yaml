@@ -24,6 +24,7 @@ cols:
 - zone.name
 - provider_region
 - last_refresh_error
+- region_description
 
 # Included tables (joined, has_one, has_many) and columns
 include:
@@ -46,6 +47,7 @@ col_order:
 - zone.name
 - provider_region
 - last_refresh_error
+- region_description
 
 # Column titles, in order
 headers:
@@ -54,6 +56,7 @@ headers:
 - Zone
 - Region
 - Last Refresh Error
+- Region Description
 
 col_formats:
 -

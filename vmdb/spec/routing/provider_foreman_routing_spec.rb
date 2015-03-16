@@ -23,14 +23,15 @@ describe 'routes for ProviderForeman' do
   %w(
     accordion_select
     button
+    create
     explorer
     exp_button
     exp_changed
     exp_token_pressed
     form_field_changed
     panel_control
-    provider_foreman_authentication_validate
-    provider_foreman_edit
+    authentication_validate
+    edit
     quick_search
     reload
     save_col_widths
@@ -38,6 +39,7 @@ describe 'routes for ProviderForeman' do
     show_list
     tree_autoload_dynatree
     tree_select
+    update
     users
     wait_for_task
     x_button
