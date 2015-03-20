@@ -33,6 +33,7 @@ describe 'routes for ProviderForeman' do
     form_field_changed
     new
     panel_control
+    provision
     quick_search
     refresh
     reload

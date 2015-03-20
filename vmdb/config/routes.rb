@@ -1281,6 +1281,7 @@ Vmdb::Application.routes.draw do
         form_field_changed
         new
         panel_control
+        provision
         quick_search
         refresh
         reload
