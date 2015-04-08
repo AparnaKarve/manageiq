@@ -310,13 +310,18 @@ class MiqSchedule < ActiveRecord::Base
     end
   end
 
-  def self.verify_depot_hash(hsh)
+  def self.verify_depot_hash!(hsh)
     prefix      = hsh[:uri].split("://").first
     depot_class = Object.const_get(FileDepot.supported_protocols[prefix])
     return true unless depot_class.requires_credentials?
 
+    depot_class.validate_settings(hsh)
+  end
+
+  def self.verify_depot_hash(hsh)
     begin
-      depot_class.validate_settings(hsh)
+      self.verify_depot_hash!(hsh)
+      true
     rescue => err
       $log.error("Miq(Schedule.verify_depot_hash) #{err.message}.")
       false
