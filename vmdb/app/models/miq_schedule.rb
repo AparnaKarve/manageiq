@@ -315,7 +315,7 @@ class MiqSchedule < ActiveRecord::Base
     depot_class = Object.const_get(FileDepot.supported_protocols[prefix])
     return true unless depot_class.requires_credentials?
 
-    depot_class.validate_settings(hsh)
+    raise "Invalid Depot Settings" unless depot_class.validate_settings(hsh)
   end
 
   def self.verify_depot_hash(hsh)
