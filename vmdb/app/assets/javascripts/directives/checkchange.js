@@ -14,19 +14,19 @@ miqAngularApplication.directive('checkchange', function() {
 
           for (var name in scope.modelCopy) {
             if(ctrl.$name == name) {
-              if(typeof (ctrl.$viewValue) == "boolean") {
-                int_value = parseInt(scope.modelCopy[name], 10);
-                var bool_value = int_value != 0 ? true : false;
-                if(ctrl.$viewValue == bool_value) {
-                  scope.form[name].$setPristine(true);
-                  break;
-                }
-              } else {
+//              if(typeof (ctrl.$viewValue) == "boolean") {
+//                int_value = parseInt(scope.modelCopy[name], 10);
+//                var bool_value = int_value != 0 ? true : false;
+//                if(ctrl.$viewValue == bool_value) {
+//                  scope.form[name].$setPristine(true);
+//                  break;
+//                }
+//              } else {
                 if (ctrl.$viewValue == scope.modelCopy[name]) {
                   scope.form[name].$setPristine(true);
                   break;
                 }
-              }
+              //}
             }
           }
 

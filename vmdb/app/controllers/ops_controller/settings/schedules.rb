@@ -156,7 +156,7 @@ module OpsController::Settings::Schedules
       :log_verify           => log_verify,
       :protocol             => protocol,
       :schedule_description => schedule.description,
-      :schedule_enabled     => schedule.enabled ? "1" : "0",
+      :schedule_enabled     => schedule.enabled ? true : false,
       :schedule_name        => schedule.name,
       :schedule_start_date  => schedule.run_at[:start_time].strftime("%m/%d/%Y"),
       :schedule_start_hour  => schedule.run_at[:start_time].strftime("%H").to_i,

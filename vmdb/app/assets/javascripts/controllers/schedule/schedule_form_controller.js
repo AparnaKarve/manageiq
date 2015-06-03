@@ -33,7 +33,7 @@ miqAngularApplication.controller('scheduleFormController', ['$http', '$scope', '
       $scope.newRecord                         = true;
       $scope.scheduleModel.action_typ          = 'vm';
       $scope.scheduleModel.filter_typ          = 'all';
-      $scope.scheduleModel.enabled             = '1';
+      $scope.scheduleModel.enabled             = true;
       $scope.scheduleModel.filterValuesEmpty   = true;
       var today                                 = new Date();
       var tomorrowsDate                         = parseInt(today.getDate()) + 1;
@@ -114,6 +114,24 @@ miqAngularApplication.controller('scheduleFormController', ['$http', '$scope', '
 
       $scope.filterList.push(tempObj);
     });
+  };
+
+  $scope.buildJSObjArr = function(arr) {
+    jsObjArr = [];
+    angular.forEach(arr, function(filteredItem) {
+      var tempObj = {};
+
+      if (Object.prototype.toString.call(filteredItem) === '[object Array]') {
+        tempObj.text = filteredItem[0];
+        tempObj.value = filteredItem[1];
+      } else {
+        tempObj.text = filteredItem;
+        tempObj.value = filteredItem;
+      }
+
+      jsObjArr.push(tempObj);
+    });
+    return jsObjArr;
   };
 
   var testType = function(type) {
@@ -238,11 +256,19 @@ miqAngularApplication.controller('scheduleFormController', ['$http', '$scope', '
 
   $scope.resetClicked = function() {
     $scope.scheduleModel = angular.copy( $scope.modelCopy );
+
+    $('#enabled').prop('checked', $scope.scheduleModel.enabled);
+    $('#action_typ').selectpicker('val', $scope.scheduleModel.action_typ);
+    $('#action_typ').selectpicker('refresh');
+
     if($scope.form.action_typ.$dirty || ($scope.form.filter_typ != undefined && $scope.form.filter_typ.$dirty)) {
       $scope.filterTypeChanged();
     }
     $scope.scheduleModel.filter_value = $scope.modelCopy.filter_value;
     $scope.angularForm.$setPristine(true);
+
+
+
     miqService.miqFlash("warn", "All changes have been reset");
   };
 
@@ -259,6 +285,27 @@ miqAngularApplication.controller('scheduleFormController', ['$http', '$scope', '
     $scope.miq_angular_date_1 = date;
     $scope.$apply(function() {
       $scope.angularForm.miq_angular_date_1.$setViewValue($scope.miq_angular_date_1);
+    });
+  };
+
+  $scope.triggerChangeForCheckbox = function(val) {
+    if ($scope.$$phase == "$apply")
+      return;
+    $scope.enabled = val;
+    $scope.$apply(function() {
+      $scope.angularForm.enabled.$setViewValue($scope.enabled);
+    });
+  };
+
+  $scope.triggerChangeForSelectPicker = function(val) {
+    if ($scope.$$phase == "$apply")
+      return;
+    $scope.action_typ = val;
+    $scope.$apply(function() {
+
+      $scope.angularForm.action_typ.$setViewValue($scope.actionTypList[val].value);
+//      $('#action_typ').selectpicker('val', val);
+//      $('#action_typ').selectpicker('refresh')
     });
   };
 

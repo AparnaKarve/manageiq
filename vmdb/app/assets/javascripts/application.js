@@ -7,6 +7,8 @@
 //= require directives/miqrequired
 //= require directives/checkchange
 //= require directives/verifypasswd
+//= require directives/checkboxpicker
+//= require directives/selectpicker
 //= require directives/repository/valid_unc_path
 //= require services/miq_service
 //= require services/timer_option_service
@@ -32,6 +34,8 @@
 //= require miq_jqplot
 //= require jquery/jquery-ui-1.9.2.custom.min
 //= require bootstrap.min
+//= require bootstrap-select.min
+//= require bootstrap-checkbox.min.js
 //= require bootstrap-hover-dropdown/bootstrap-hover-dropdown.min
 //= require patternfly.min
 //= require jquery.observe_field
