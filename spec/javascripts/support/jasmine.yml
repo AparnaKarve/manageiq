@@ -26,6 +26,7 @@ src_files:
   - javascripts/directives/repository/valid_unc_path.js
   - javascripts/directives/checkchange.js
   - javascripts/directives/miqrequired.js
+  - javascripts/directives/selectpickerForSelectTag.js
   - javascripts/import.js
 
 # stylesheets

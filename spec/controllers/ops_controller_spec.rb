@@ -191,7 +191,7 @@ describe OpsController do
          :name               => "test_schedule",
          :description        => "new_description",
          :action_typ         => "vm",
-         :miq_angular_date_1 => "06/25/2015",
+         :start_date         => "06/25/2015",
          :timer_typ          => "Once",
          :timer_value        => ""
 

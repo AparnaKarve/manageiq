@@ -1,6 +1,6 @@
 .button-group
   = button_tag("Add",
-               :class        => "btn btn-primary",
+               :class        => "btn-primary btn-disabled",
                :alt          => "Add",
                :title        => "Add",
                "ng-class"    => "{'btn-disabled': !angularForm.$valid}",
@@ -9,7 +9,7 @@
                "ng-show"     => "newRecord")
 
   = button_tag("Save",
-               :class        => "btn btn-primary",
+               :class        => "btn-primary btn-disabled",
                :alt          => "Save changes",
                :title        => "Save changes",
                "ng-class"    => "{'btn-disabled': angularForm.$pristine || angularForm.$invalid}",
@@ -18,7 +18,7 @@
                "ng-hide"     => "newRecord")
 
   = button_tag("Reset",
-               :class        => "btn btn-primary",
+               :class        => "btn-default btn-disabled",
                :alt          => "Reset changes",
                :title        => "Reset changes",
                "ng-class"    => "{'btn-disabled': angularForm.$pristine}",
