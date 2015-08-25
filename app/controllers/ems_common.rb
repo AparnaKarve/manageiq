@@ -593,7 +593,7 @@ module EmsCommon
     changed = edit_changed?
     update_ems = find_by_id_filtered(model, params[:id])
     set_record_vars(update_ems)
-    if update_ems.save
+    if valid_record?(update_ems) && update_ems.save
       update_ems.reload
       flash = _("%{model} \"%{name}\" was saved") %
               {:model => ui_lookup(:model => model.to_s), :name => update_ems.name}
