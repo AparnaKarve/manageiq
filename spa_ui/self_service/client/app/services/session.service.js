@@ -5,7 +5,7 @@
     .factory('Session', SessionFactory);
 
   /** @ngInject */
-  function SessionFactory($http, moment, $sessionStorage, gettextCatalog) {
+  function SessionFactory($http, moment, $sessionStorage, gettextCatalog, lodash) {
     var model = {
       token: null,
       user: {}
@@ -41,6 +41,7 @@
       return $http.get('/api')
         .then(function(response) {
           currentUser(response.data.identity);
+          userFeatures(); // use features instead of identity
 
           var locale = response.data.settings && response.data.settings.locale;
           gettextCatalog.loadAndSet(locale);
@@ -53,6 +54,37 @@
       }
 
       return model.user;
+    }
+
+    function userFeatures() {
+      var hardcodedUserFeatures = [
+        {'id': 10000000004060, 'identifier': "service_edit", 'parent_id': 10000000004059},
+        {'id': 10000000004061, 'identifier': "service_delete", 'parent_id': 10000000004059},
+        {'id': 10000000004058, 'identifier': "service_view", 'parent_id': 10000000004056},
+        {'id': 10000000004056, 'identifier': "service", 'parent_id': 10000000003876}
+      ];
+
+      var serviceFeature = lodash.find(hardcodedUserFeatures, function(o) {
+        return o.identifier === "service";
+      });
+      var serviceCatalogFeature = lodash.find(hardcodedUserFeatures, function(o) {
+        return o.identifier === "svc_catalog_accord";
+      });
+      var requestFeature = lodash.find(hardcodedUserFeatures, function(o) {
+        return o.identifier === "miq_request";
+      });
+
+      var features = {
+        dashboard: {show: angular.isDefined(serviceFeature) ||
+                          angular.isDefined(requestFeature) ||
+                          angular.isDefined(serviceCatalogFeature)},
+        services: {show: angular.isDefined(serviceFeature)},
+        requests: {show: angular.isDefined(requestFeature)},
+        marketplace: {show: angular.isDefined(serviceCatalogFeature)}
+      };
+      model.features = features;
+
+      return model.features;
     }
 
     // Helpers
