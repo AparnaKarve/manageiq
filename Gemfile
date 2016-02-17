@@ -29,6 +29,7 @@ gem "lodash-rails",                   "~>3.10.0"
 gem "patternfly-sass",                "~>3.3.3"
 gem "sass-rails"
 gem "sprockets-es6",                  "~>0.9.0",  :require => "sprockets/es6"
+gem "angular-rails4-templates"
 
 # Vendored and required
 gem "ruport",                         "=1.7.0",                       :git => "git://github.com/ManageIQ/ruport.git", :tag => "v1.7.0-3"
