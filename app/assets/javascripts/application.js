@@ -13,6 +13,8 @@
 //= require angular-ui-bootstrap
 //= require angular-ui-bootstrap-tpls
 //= require angular-sanitize
+//= require angular-ui-router
+//= require angular-rails4-templates
 //= require moment
 //= require moment-strftime/build/moment-strftime.min
 //= require moment-timezone
@@ -20,9 +22,12 @@
 //= require numeral
 //= require miq_api
 //= require miq_angular_application
-//= require_tree ./directives/
-//= require_tree ./services/
+//= require miq_angular_configuration
+//= require_tree ./components/
 //= require_tree ./controllers/
+//= require_tree ./directives/
+//= require_tree ./factories/
+//= require_tree ./services/
 //= require d3
 //= require c3
 //= require lodash
@@ -76,3 +81,4 @@
 //= require xml_display
 //= require miq_c3
 //= require miq_explorer
+//= require_tree ../templates
