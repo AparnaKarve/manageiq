@@ -2128,6 +2128,7 @@ Vmdb::Application.routes.draw do
     :service                  => {
       :get  => %w(
         download_data
+        edit
         explorer
         retirement_info
         reconfigure_form_fields
@@ -2142,7 +2143,7 @@ Vmdb::Application.routes.draw do
         ownership_update
         reload
         retire
-        service_edit
+        edit
         service_tag
         tag_edit_form_field_changed
         tree_autoload_dynatree
