@@ -67,7 +67,7 @@ module EmsInfraHelper::TextualSummary
     available = @ems.number_of(:ems_folders) > 0 && @ems.ems_folder_root
     h         = {:label => label, :image => "hosts_and_clusters", :value => available ? _("Available") : _("N/A")}
     if available
-      h[:link]  = url_for(:action => 'show', :id => @ems, :display => 'ems_folders')
+      h[:link]  = ems_infra_path(@ems.id, :display => 'ems_folders')
       h[:title] = _("Show %{label}") % {:label => label}
     end
     h
@@ -79,7 +79,7 @@ module EmsInfraHelper::TextualSummary
     available = @ems.number_of(:ems_folders) > 0 && @ems.ems_folder_root
     h         = {:label => label, :image => "vms_and_templates", :value => available ? _("Available") : _("N/A")}
     if available
-      h[:link]  = url_for(:action => 'show', :id => @ems, :display => 'ems_folders', :vat => true)
+      h[:link]  = ems_infra_path(@ems.id, :display => 'ems_folders', :vat => true)
       h[:title] = _("Show Virtual Machines & Templates")
     end
     h
@@ -90,7 +90,7 @@ module EmsInfraHelper::TextualSummary
     num   = @ems.number_of(:ems_clusters)
     h     = {:label => label, :image => "cluster", :value => num}
     if num > 0 && role_allows(:feature => "ems_cluster_show_list")
-      h[:link] = url_for(:action => 'show', :id => @ems, :display => 'ems_clusters')
+      h[:link] = ems_infra_path(@ems.id, :display => 'ems_clusters', :vat => true)
       h[:title] = _("Show all %{label}") % {:label => label}
     end
     h
@@ -101,7 +101,7 @@ module EmsInfraHelper::TextualSummary
     num   = @ems.number_of(:hosts)
     h     = {:label => label, :image => "host", :value => num}
     if num > 0 && role_allows(:feature => "host_show_list")
-      h[:link]  = url_for(:action => 'show', :id => @ems, :display => 'hosts')
+      h[:link]  = ems_infra_path(@ems.id, :display => 'hosts')
       h[:title] = _("Show all %{label}") % {:label => label}
     end
     h
@@ -112,7 +112,7 @@ module EmsInfraHelper::TextualSummary
 
     textual_link(@record.cloud_tenants,
                  :as   => CloudTenant,
-                 :link => url_for(:action => 'show', :id => @record, :display => 'cloud_tenants'))
+                 :link => ems_infra_path(@record.id, :display => 'cloud_tenants'))
   end
 
   def textual_used_availability_zones
@@ -120,7 +120,7 @@ module EmsInfraHelper::TextualSummary
 
     textual_link(@record.availability_zones,
                  :as   => AvailabilityZone,
-                 :link => url_for(:action => 'show', :id => @record, :display => 'availability_zones'))
+                 :link => ems_infra_path(@record.id, :display => 'availability_zones'))
   end
 
   def textual_datastores
@@ -128,7 +128,7 @@ module EmsInfraHelper::TextualSummary
 
     textual_link(@record.storages,
                  :as   => Storage,
-                 :link => url_for(:action => 'show', :id => @record, :display => 'storages'))
+                 :link => ems_infra_path(@record.id, :display => 'storages'))
   end
 
   def textual_vms
