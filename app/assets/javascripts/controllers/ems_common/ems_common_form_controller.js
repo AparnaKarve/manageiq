@@ -10,6 +10,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       project: '',
       api_port: '',
       api_version: '',
+      realm: '',
       security_protocol: '',
       provider_region: '',
       default_userid: '',
@@ -27,8 +28,11 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       service_account: '',
       emstype_vm: false,
       ems_common: true,
-      azure_tenant_id: ''
+      azure_tenant_id: '',
+      host_default_vnc_port_start: '',
+      host_default_vnc_port_end: ''
     };
+    $scope.realmNote = __("Note: Username must be in the format: name@realm");
     $scope.formId = emsCommonFormId;
     $scope.afterGet = false;
     $scope.validateClicked = miqService.validateWithREST;
@@ -72,6 +76,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
 
         $scope.emsCommonModel.api_port                        = data.api_port;
         $scope.emsCommonModel.api_version                     = data.api_version;
+        $scope.emsCommonModel.realm                           = data.realm;
         $scope.emsCommonModel.security_protocol               = data.security_protocol;
         $scope.emsCommonModel.provider_region                 = data.provider_region;
 
@@ -202,6 +207,24 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
     }
 
     return false;
+  };
+
+  $scope.providerTypeChanged = function() {
+    $scope.emsCommonModel.api_port = "";
+    $scope.emsCommonModel.security_protocol = "";
+    $scope.note = "";
+    if ($scope.emsCommonModel.emstype === 'openstack_infra') {
+      $scope.emsCommonModel.api_port = "5000";
+    } else if ($scope.emsCommonModel.emstype === 'scvmm' && $scope.emsCommonModel.security_protocol === 'kerberos'){
+      $scope.note = $scope.realmNote;
+    }
+  };
+
+  $scope.scvmmSecurityProtocolChanged = function() {
+    $scope.note = "";
+    if ($scope.emsCommonModel.emstype === 'scvmm' && $scope.emsCommonModel.security_protocol === 'kerberos'){
+      $scope.note = $scope.realmNote;
+    }
   };
 
   init();
