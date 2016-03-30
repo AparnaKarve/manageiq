@@ -1,4 +1,4 @@
-ManageIQ.angular.app.controller('serviceFormController', ['$http', '$scope', 'serviceFormId', 'miqService', function($http, $scope, serviceFormId, miqService) {
+ManageIQ.angular.app.controller('serviceFormController', ['$http', '$scope', 'serviceFormId', 'miqService',  'serviceData', function($http, $scope, serviceFormId, miqService, serviceData) {
     var init = function() {
 
       $scope.serviceModel = {
@@ -8,19 +8,12 @@ ManageIQ.angular.app.controller('serviceFormController', ['$http', '$scope', 'se
       $scope.formId    = serviceFormId;
       $scope.afterGet  = false;
       $scope.newRecord = false;
-      $scope.modelCopy = angular.copy( $scope.serviceModel );
       $scope.model     = "serviceModel";
       ManageIQ.angular.scope = $scope;
 
-      miqService.sparkleOn();
-      $http.get('/service/service_form_fields/' + serviceFormId).success(function(data) {
-        $scope.serviceModel.name        = data.name;
-        $scope.serviceModel.description = data.description;
-
-        $scope.afterGet = true;
-        $scope.modelCopy = angular.copy( $scope.serviceModel );
-        miqService.sparkleOff();
-      });
+      $scope.serviceModel.name = serviceData.data.name;
+      $scope.serviceModel.description = serviceData.data.description;
+      $scope.modelCopy = angular.copy( $scope.serviceModel );
 
       // need this in order to get Abandon Changes? prompt when leaving form without saving
       $scope.$watch("serviceModel.name", function() {
