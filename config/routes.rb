@@ -2165,7 +2165,6 @@ Vmdb::Application.routes.draw do
         retirement_info
         reconfigure_form_fields
         retire
-        service_form_fields
         show
       ),
       :post => %w(
