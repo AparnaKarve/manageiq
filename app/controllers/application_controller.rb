@@ -1751,6 +1751,7 @@ class ApplicationController < ActionController::Base
         end
       elsif params[:pressed] == "service_edit" && (params[:id] || @redirect_id)
         render :update do |page|
+          page << javascript_prologue
           page.redirect_to edit_service_path(params[:id] || @redirect_id)
         end
       else
