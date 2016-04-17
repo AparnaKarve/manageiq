@@ -105,6 +105,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
         $scope.emsCommonModel.provider_region                 = data.provider_region;
         $scope.emsCommonModel.default_userid                  = data.default_userid;
         $scope.emsCommonModel.amqp_userid                     = data.amqp_userid;
+        $scope.emsCommonModel.metrics_userid                  = data.metrics_userid;
 
         $scope.emsCommonModel.ssh_keypair_userid              = data.ssh_keypair_userid;
 
