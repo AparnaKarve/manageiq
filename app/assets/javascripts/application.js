@@ -14,7 +14,7 @@
 //= require angular-ui-bootstrap-tpls
 //= require angular-sanitize
 //= require angular-ui-router
-//= require angular-rails4-templates
+//= require angular-rails-templates
 //= require moment
 //= require moment-strftime/build/moment-strftime.min
 //= require moment-timezone
