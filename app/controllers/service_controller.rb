@@ -138,6 +138,7 @@ class ServiceController < ApplicationController
     @service = find_by_id_filtered(Service, checked[0])
     @in_a_form = true
     @title = _("Editing %{model} \"%{name}\"") % {:name => @service.name, :model => ui_lookup(:model => "Service")}
+    @explorer = true
   end
 
   def service_reconfigure
@@ -281,12 +282,15 @@ class ServiceController < ApplicationController
       if ["dialog_provision", "ownership", "retire", "service_edit", "tag"].include?(action)
         r[:partial => partial]
       elsif params[:display]
-        r[:partial => 'layouts/x_gtl', :locals => {:controller => "vm", :action_url => @lastaction}]
+        r[:partial => 'layouts/angular_right_cell', :locals => {:controller         => "vm",
+                                                                :action_url         => @lastaction,
+                                                                :right_cell_partial => "layouts/x_gtl"}]
       elsif record_showing
-        r[:partial => "service/svcs_show", :locals => {:controller => "service"}]
+        r[:partial => "layouts/angular_right_cell", :locals => {:controller         => "service",
+                                                                :right_cell_partial => "service/svcs_show"}]
       else
         presenter.update(:paging_div, r[:partial => "layouts/x_pagingcontrols"])
-        r[:partial => "layouts/x_gtl"]
+        r[:partial => "layouts/angular_right_cell", :locals => {:right_cell_partial => "layouts/x_gtl"}]
       end
     )
     if %w(dialog_provision ownership tag).include?(action)

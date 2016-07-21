@@ -51,5 +51,20 @@
     %body{body}
       = render :partial => "layouts/header"
       = render :partial => "layouts/content"
+
+    - if controller.send(:angular_app?)
+      - if !@in_a_form
+        :javascript
+          var leftCell = $('#default_left_cell').html();
+          if (leftCell != undefined) {
+            localStorage.setItem("default_left_cell", leftCell);
+          }
+      - else
+        :javascript
+          $('#default_left_cell').html(localStorage.getItem("default_left_cell"));
+          $('#toolbar').hide();
+          $('#' + localStorage.getItem("left_cell_tree") + '_div').prop('disabled', true);
+          miqDimDiv('#' + localStorage.getItem("left_cell_tree") + '_div', true);
+    - else
       = render :partial => 'layouts/footer'
 
