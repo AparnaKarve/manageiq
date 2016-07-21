@@ -137,6 +137,7 @@ class ServiceController < ApplicationController
     @service = find_by_id_filtered(Service, checked[0])
     @in_a_form = true
     @title = _("Editing %{model} \"%{name}\"") % {:name => @service.name, :model => ui_lookup(:model => "Service")}
+    replace_right_cell("edit")
   end
 
   def service_reconfigure
@@ -237,6 +238,10 @@ class ServiceController < ApplicationController
       partial = "shared/views/retire"
       header = _("Set/Remove retirement date for %{model}") % {:model => ui_lookup(:model => "Service")}
       action = "retire"
+    when "edit"
+      partial = "form"
+      header = _("Editing %{model} \"%{name}\"") % {:name => @service.name, :model => ui_lookup(:model => "Service")}
+      action = "edit"
     when "tag"
       partial = "layouts/tagging"
       header = _("Edit Tags for %{model}") % {:model => ui_lookup(:model => "Service")}
@@ -277,15 +282,15 @@ class ServiceController < ApplicationController
 
     # Replace right cell divs
     presenter.update(:main_div,
-      if ["dialog_provision", "ownership", "retire", "service_edit", "tag"].include?(action)
+      if ["dialog_provision", "ownership", "retire", "edit", "tag"].include?(action)
         r[:partial => partial]
       elsif params[:display]
-        r[:partial => 'layouts/x_gtl', :locals => {:controller => "vm", :action_url => @lastaction}]
+        r[:partial => 'layouts/angular_right_cell', :locals => {:controller => "vm", :action_url => @lastaction, :right_cell_partial => "layouts/x_gtl"}]
       elsif record_showing
-        r[:partial => "service/svcs_show", :locals => {:controller => "service"}]
+        r[:partial => "layouts/angular_right_cell", :locals => {:controller => "service", :right_cell_partial => "service/svcs_show"}]
       else
         presenter.update(:paging_div, r[:partial => "layouts/x_pagingcontrols"])
-        r[:partial => "layouts/x_gtl"]
+        r[:partial => "layouts/angular_right_cell", :locals => {:right_cell_partial => "layouts/x_gtl"}]
       end
     )
     if %w(dialog_provision ownership tag).include?(action)
@@ -339,7 +344,7 @@ class ServiceController < ApplicationController
     # unset variable that was set in form_field_changed to prompt for changes when leaving the screen
     presenter.reset_changes
 
-    render :json => presenter.to_json
+    render :json => presenter.to_json if action != "edit"
   end
 
   # Build a Services explorer tree
