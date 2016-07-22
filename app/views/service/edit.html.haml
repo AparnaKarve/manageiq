@@ -1,5 +1,6 @@
 = render :partial => "service/form"
 
 :javascript
-  localStorage.setItem("left_cell_tree", "svcs_tree");
+  $('#toolbar').hide();
+  miqSetLeftCellTree("svcs_tree");
 
