@@ -65,6 +65,7 @@
           $('#toolbar').hide();
           $('#' + localStorage.getItem("left_cell_tree") + '_div').prop('disabled', true);
           miqDimDiv('#' + localStorage.getItem("left_cell_tree") + '_div', true);
+          $('#form_buttons_div').html("<div id='angular_paging_div_buttons'></div>");
     - else
       = render :partial => 'layouts/footer'
 
